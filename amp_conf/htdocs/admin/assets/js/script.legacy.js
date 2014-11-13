@@ -1330,3 +1330,74 @@ $(document).ready(function() {
 		}
 	};
 });
+
+/* Password Functionality including Streingth indication and a view/hide
+ * Your password HTML:
+ * <input type = 'password' class = 'password-meter password-toggle'>
+ * password-meter: does streingth test. Results returned to password-result
+ * password-toggle provides a view/hide button.
+ * For Results from password-meter add the following HTML as appropriate:
+ * <div class = 'password-result'></div>
+ * 
+ * Password scoring done by zxcvbn:
+ * https://github.com/dropbox/zxcvbn
+ */
+
+//Loading zxcvbn, function taken from zxcvbn-async.js
+(function(){
+	var a;
+	a=function(){
+		var a,b;
+		b=document.createElement("script");
+		b.src="/admin/assets/js/zxcvbn.js";
+		b.type="text/javascript";
+		b.async=!0;
+		a=document.getElementsByTagName("script")[0];
+		return a.parentNode.insertBefore(b,a)
+		};
+	null!=window.attachEvent?window.attachEvent("onload",a):window.addEventListener("load",a,!1)}).call(this);
+	
+//Handle password-meter, generate password-result
+$(document).on('keyup', '.password-meter',function() {
+	var textVal = $(this).val();
+	var result = zxcvbn(textVal);
+	var reshtml = '';
+	switch(result.score){
+		case 0:
+			reshtml = '<p class = "text-danger">Password quality Poor</p>';
+			break;
+		case 1:
+			reshtml = '<p class = "text-danger">Password quality Poor</p>';
+			break;
+		case 2:
+			reshtml = '<p class = "text-info">Password quality Low</p>';
+			break;
+		case 3:
+			reshtml = '<p class = "text-success">Password quality Sufficient</p>';
+			break;
+		case 4:
+			reshtml = '<p class = "text-success">Password quality High</p>';
+			break;
+	}
+   $('.password-result').html(reshtml);
+});
+
+//Handle passwore-toggle
+$(document).ready(function(){
+	$('.password-toggle').after('&nbsp;<button id="vispassbtn" class="btn btn-default btn-xs" type="button"><span class="glyphicon glyphicon-eye-open vispassico" aria-hidden="true"></button>');
+	$('#vispassbtn').click(function(){
+		switch($('.password-toggle').attr('type')){
+			case 'password':
+				$('.password-toggle').attr('type', 'text');
+				$('.vispassico').removeClass('glyphicon-eye-open');
+				$('.vispassico').addClass('glyphicon-eye-close');
+				break;
+			case 'text':
+				$('.password-toggle').attr('type', 'password');
+				$('.vispassico').removeClass('glyphicon-eye-close');
+				$('.vispassico').addClass('glyphicon-eye-open');
+				break;
+		}
+	});
+});
+
